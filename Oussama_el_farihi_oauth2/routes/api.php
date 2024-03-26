@@ -15,6 +15,11 @@ use App\Http\Controllers\UserController;
 |
 */
 
+Route::post('register', 'App\Http\Controllers\AuthController@register');
+Route::post('login', 'App\Http\Controllers\AuthController@login');
+Route::middleware('auth:api')->post('logout', 'App\Http\Controllers\AuthController@logout');
+
+
 Route::middleware('auth:api')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/users', [UserController::class, 'store']);
