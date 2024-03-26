@@ -23,7 +23,6 @@ Route::middleware('api')->group(function () {
 });
 
 
-
 Route::middleware('auth:api')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/users', [UserController::class, 'store']);
