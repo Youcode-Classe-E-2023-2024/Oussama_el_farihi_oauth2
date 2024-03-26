@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -15,9 +16,12 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::post('register', 'App\Http\Controllers\AuthController@register');
-Route::post('login', 'App\Http\Controllers\AuthController@login');
-Route::middleware('auth:api')->post('logout', 'App\Http\Controllers\AuthController@logout');
+Route::middleware('api')->group(function () {
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::middleware('auth:api')->post('logout', [AuthController::class, 'logout']);
+});
+
 
 
 Route::middleware('auth:api')->group(function () {
