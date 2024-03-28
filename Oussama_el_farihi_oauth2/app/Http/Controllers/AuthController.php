@@ -40,7 +40,7 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-        $accessToken = $user->createToken('authToken')->accessToken;
+        $accessToken = $user->createToken('authToken')->plainTextToken;
 
         return response(['user' => $user, 'access_token' => $accessToken]);
     }
