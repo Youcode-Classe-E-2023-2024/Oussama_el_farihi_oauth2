@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
  * @OA\Schema(
  *   schema="User",
  *   type="object",
- *   required={"name", "email", "password"},
+ *   required={"name", "email"},
  *   @OA\Property(
  *     property="id",
  *     type="integer",
@@ -31,18 +31,14 @@ use Illuminate\Support\Facades\Validator;
  *     description="User's email"
  *   ),
  *   @OA\Property(
- *     property="password",
- *     type="string",
- *     format="password",
- *     description="User's password"
- *   ),
- *   @OA\Property(
- *     property="role",
- *     type="string",
- *     description="User's role"
+ *     property="roles",
+ *     type="array",
+ *     @OA\Items(type="string"),
+ *     description="User's roles"
  *   )
  * )
  */
+
 
 
 class UserController extends Controller
@@ -114,7 +110,27 @@ class UserController extends Controller
         return response()->json($user, 201);
     }
 
-    // Lister tous les utilisateurs (Read)
+    /**
+ * @OA\Get(
+ *     path="/api/users",
+ *     summary="List all users",
+ *     tags={"Users"},
+ *     security={{ "apiAuth": {} }},
+ *     @OA\Response(
+ *         response=200,
+ *         description="A list of users",
+ *         @OA\JsonContent(
+ *             type="array",
+ *             @OA\Items(ref="#/components/schemas/User")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Unauthorized"
+ *     )
+ * )
+ */
+
     public function index()
     {
         if (!auth()->user()->hasRole('admin')) {
@@ -125,7 +141,44 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    // Mettre à jour un utilisateur (Update)
+    /**
+ * @OA\Put(
+ *     path="/api/users/{user}",
+ *     summary="Update an existing user",
+ *     tags={"Users"},
+ *     security={{ "apiAuth": {} }},
+ *     @OA\Parameter(
+ *         name="user",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="integer"
+ *         )
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="name", type="string"),
+ *             @OA\Property(property="email", type="string", format="email"),
+ *             @OA\Property(property="password", type="string", format="password"),
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User updated successfully",
+ *         @OA\JsonContent(ref="#/components/schemas/User")
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Unauthorized"
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad Request"
+ *     )
+ * )
+ */
+
     public function update(Request $request, User $user)
     {
         if (!auth()->user()->hasRole('admin')) {
@@ -151,7 +204,31 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    // Supprimer un utilisateur (Delete)
+    /**
+ * @OA\Delete(
+ *     path="/api/users/{user}",
+ *     summary="Delete a user",
+ *     tags={"Users"},
+ *     security={{ "apiAuth": {} }},
+ *     @OA\Parameter(
+ *         name="user",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="integer"
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User deleted successfully"
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Unauthorized"
+ *     )
+ * )
+ */
+
     public function destroy(User $user)
     {
         if (!auth()->user()->hasRole('admin')) {
