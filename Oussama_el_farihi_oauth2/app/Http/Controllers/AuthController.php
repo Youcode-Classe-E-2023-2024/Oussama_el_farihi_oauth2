@@ -9,6 +9,30 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+
+    /**
+ * @OA\Post(
+ *     path="/api/register",
+ *     summary="Register a new user",
+ *     tags={"Authentication"},
+ *     @OA\RequestBody(
+ *         @OA\JsonContent(
+ *             required={"name","email","password"},
+ *             @OA\Property(property="name", type="string"),
+ *             @OA\Property(property="email", type="string", format="email"),
+ *             @OA\Property(property="password", type="string", format="password"),
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User registered successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="user", type="object"),
+ *             @OA\Property(property="access_token", type="string")
+ *         )
+ *     )
+ * )
+ */
     public function register(Request $request)
     {
         $validatedData = $request->validate([
@@ -28,6 +52,33 @@ class AuthController extends Controller
         return response(['user' => $user, 'access_token' => $token]);
     }
 
+
+    /**
+ * @OA\Post(
+ *     path="/api/login",
+ *     summary="Authenticate user and return a token",
+ *     tags={"Authentication"},
+ *     @OA\RequestBody(
+ *         @OA\JsonContent(
+ *             required={"email","password"},
+ *             @OA\Property(property="email", type="string", format="email"),
+ *             @OA\Property(property="password", type="string", format="password"),
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User authenticated successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="user", type="object"),
+ *             @OA\Property(property="access_token", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Invalid credentials"
+ *     )
+ * )
+ */
     public function login(Request $request)
     {
         $loginData = $request->validate([
@@ -45,6 +96,19 @@ class AuthController extends Controller
         return response(['user' => $user, 'access_token' => $accessToken]);
     }
 
+
+    /**
+ * @OA\Post(
+ *     path="/api/logout",
+ *     summary="Log the user out (Invalidate the token)",
+ *     tags={"Authentication"},
+ *     security={{ "apiAuth": {} }},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successfully logged out"
+ *     )
+ * )
+ */
     public function logout(Request $request)
     {
         $request->user()->token()->revoke();

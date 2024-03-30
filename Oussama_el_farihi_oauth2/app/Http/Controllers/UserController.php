@@ -8,18 +8,84 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * @OA\Schema(
+ *   schema="User",
+ *   type="object",
+ *   required={"name", "email", "password"},
+ *   @OA\Property(
+ *     property="id",
+ *     type="integer",
+ *     format="int64",
+ *     description="User ID"
+ *   ),
+ *   @OA\Property(
+ *     property="name",
+ *     type="string",
+ *     description="User's name"
+ *   ),
+ *   @OA\Property(
+ *     property="email",
+ *     type="string",
+ *     format="email",
+ *     description="User's email"
+ *   ),
+ *   @OA\Property(
+ *     property="password",
+ *     type="string",
+ *     format="password",
+ *     description="User's password"
+ *   ),
+ *   @OA\Property(
+ *     property="role",
+ *     type="string",
+ *     description="User's role"
+ *   )
+ * )
+ */
+
+
 class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth'); // Assurez-vous que l'utilisateur est authentifié
-        // Vous pourriez également ajouter une vérification de rôle spécifique ici si toutes les méthodes nécessitent un rôle admin
+        $this->middleware('auth');
     }
 
-    // Créer un nouvel utilisateur (Create)
+            /**
+ * @OA\Post(
+ *     path="/api/users",
+ *     summary="Create a new user",
+ *     tags={"Users"},
+ *     security={{ "apiAuth": {} }},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"name", "email", "password", "role"},
+ *             @OA\Property(property="name", type="string"),
+ *             @OA\Property(property="email", type="string", format="email"),
+ *             @OA\Property(property="password", type="string", format="password"),
+ *             @OA\Property(property="role", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="User created successfully",
+ *         @OA\JsonContent(ref="#/components/schemas/User")
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Unauthorized"
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad Request"
+ *     )
+ * )
+ */
     public function store(Request $request)
     {
-        // Vérifier si l'utilisateur connecté est un admin
+
         if (!auth()->user()->hasRole('admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
